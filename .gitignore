@@ -1,0 +1,4 @@
+data-build/raw/
+.DS_Store
+__pycache__/
+node_modules/
