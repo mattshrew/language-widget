@@ -135,6 +135,18 @@ for (const family of FAMILIES) {
       if (family === "accessoryInline") check(text.includes(e.def.split(";")[0]), `${label}: inline shows first sense`);
       else if (family !== "accessoryCircular") check(text.includes(e.def), `${label}: shows definition`);
     }
+    // tapping opens today's word in a dictionary; "both" layouts link each half separately
+    const first = r.exports.pickWord(DATA[want[0]], want[0], NOW);
+    check(r.widget.url === r.exports.dictionaryUrl(want[0], first.word), `${label}: widget url opens ${first.word}`);
+    if (want.length > 1) {
+      const links = [];
+      const walk = (s) => s.items?.forEach((i) => { if (i.url) links.push(i.url); walk(i); });
+      walk(r.widget);
+      for (const lang of want) {
+        const u = r.exports.dictionaryUrl(lang, r.exports.pickWord(DATA[lang], lang, NOW).word);
+        check(links.includes(u), `${label}: ${lang} half links to its own word`);
+      }
+    }
     if (family === "accessoryInline") check(r.widget.texts().length === 1, `${label}: inline has exactly one text`);
     const next = new Date(2026, 10, 16, 0, 0, 5);
     check(r.widget.refreshAfterDate?.getTime() === next.getTime(), `${label}: refreshes at next local midnight`);
@@ -170,6 +182,8 @@ for (const lang of ["zh", "ko"]) {
   check(!!L.pickWord(list, lang, new Date(2025, 5, 1)), `${lang}: works before start date`);
 }
 check(L.pickWord(DATA.zh, "zh", NOW) !== L.pickWord(DATA.ko, "ko", NOW) , "zh and ko pick independently");
+check(L.dictionaryUrl("zh", "学习") === "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=%E5%AD%A6%E4%B9%A0", "zh dictionary url (MDBG)");
+check(L.dictionaryUrl("ko", "학교") === "https://korean.dict.naver.com/koendict/#/search?query=%ED%95%99%EA%B5%90", "ko dictionary url (Naver)");
 
 // ---------- 3. local midnight & time zones ----------
 console.log("Midnight / time zones");

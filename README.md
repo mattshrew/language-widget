@@ -15,7 +15,8 @@ picked from the date.
 
 1. Install **Scriptable** from the App Store and open it once. Make sure iCloud Drive
    is on (Settings → your name → iCloud → iCloud Drive).
-2. Copy the contents of `dist/` into the **Scriptable** folder in iCloud Drive:
+2. **Copy** (not move) the contents of `dist/` into the **Scriptable** folder in iCloud Drive.
+   In Finder, dragging to iCloud Drive *moves* files. Hold ⌥ Option while dragging to copy.
    - From a Mac signed in to the same iCloud account: copy into
      `~/Library/Mobile Documents/iCloud~dk~simonbs~Scriptable/Documents/`, or
    - AirDrop / Files app: put `Word of the Day.js` and the `word-of-the-day/` folder
@@ -47,6 +48,10 @@ The rectangular slot shows word, reading and definition. The inline slot above t
 - The day's word is a deterministic shuffle of the list, indexed by the number of
   days since 2026-01-01 in your **local** time zone. Every word appears once before any repeats.
 - The widget asks iOS to refresh at local midnight. iOS may refresh a few minutes late.
+- **Tapping** opens today's word in a dictionary: [MDBG](https://www.mdbg.net) for Chinese,
+  [Naver Korean–English](https://korean.dict.naver.com/koendict/) for Korean. In a `both`
+  widget, each half opens its own word. This overrides the widget's "When Interacting" setting.
+  To see the "Today's words" sheet and widget previews, run the script inside Scriptable.
 
 ## Rebuilding the word lists
 ```bash

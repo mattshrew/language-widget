@@ -62,6 +62,14 @@ function nextMidnight(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 5);
 }
 
+/** Dictionary page for a word, opened when the widget is tapped. */
+function dictionaryUrl(lang, word) {
+  const q = encodeURIComponent(word);
+  return lang === "ko"
+    ? `https://korean.dict.naver.com/koendict/#/search?query=${q}` // Naver Korean–English
+    : `https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=${q}`; // MDBG
+}
+
 /** "zh" | "ko" | "both" from the widget parameter; "both" only where it fits. */
 function parseLangs(param, family) {
   const p = String(param || "zh").trim().toLowerCase();
@@ -152,6 +160,7 @@ function drawMediumSingle(w, lang, e) {
 function drawColumn(stack, lang, e, wordSize, defLines) {
   const col = stack.addStack();
   col.layoutVertically();
+  col.url = dictionaryUrl(lang, e.word); // each half opens its own word
   tag(col, lang, e, 10);
   col.addSpacer(2);
   addText(col, e.word, Font.boldSystemFont(wordSize), C.text, { lines: 1, scale: 0.35 });
@@ -183,7 +192,10 @@ function drawLargeBlock(stack, lang, e, wordSize, defLines) {
 function drawLarge(w, picks, date) {
   picks.forEach(([lang, e], i) => {
     if (i) w.addSpacer(16);
-    drawLargeBlock(w, lang, e, picks.length > 1 ? 44 : 60, picks.length > 1 ? 2 : 5);
+    const block = w.addStack();
+    block.layoutVertically();
+    block.url = dictionaryUrl(lang, e.word); // each half opens its own word
+    drawLargeBlock(block, lang, e, picks.length > 1 ? 44 : 60, picks.length > 1 ? 2 : 5);
   });
   w.addSpacer();
   const df = new DateFormatter();
@@ -223,6 +235,10 @@ function buildWidget(family, picks, date) {
     case "extraLarge": drawLarge(w, picks, date); break;
     default: drawSmall(w, lang, e);
   }
+  // Tapping opens the word in a dictionary. A widget URL overrides the widget's
+  // "When Interacting" setting. Small and lock-screen widgets have one tap target;
+  // in "both" layouts each half has its own link (set above) and this is the fallback.
+  w.url = dictionaryUrl(lang, e.word);
   w.refreshAfterDate = nextMidnight(date);
   return w;
 }
@@ -279,6 +295,6 @@ async function main(now = new Date()) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { localDayIndex, seededPermutation, pickWord, nextMidnight, parseLangs, buildWidget, main };
+  module.exports = { localDayIndex, seededPermutation, pickWord, nextMidnight, parseLangs, dictionaryUrl, buildWidget, main };
 }
 if (typeof WOTD_TEST === "undefined") await main();
